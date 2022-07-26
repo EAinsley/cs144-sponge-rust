@@ -1,21 +1,14 @@
-use std::io::{Read, Write};
-use std::net::{Shutdown, TcpStream};
-
-fn main() {
-    let url = r"cs144.keithw.org";
-    let path = r"/nph-hasher/xyzzy";
-    let mut stream = TcpStream::connect(url.to_owned() + ":80").expect("cant connet to the server");
-    let message = format!("GET {path} HTTP/1.1\r\nHost: {url}\r\nConnection: close\r\n\r\n");
-    stream
-        .write_all(message.as_bytes())
-        .expect("error when sending message");
-    println!("Message sent:\n{}", message);
-    let mut response = String::new();
-    stream
-        .read_to_string(&mut response)
-        .expect("error when reading response");
-    println!("{}", response);
-    stream
-        .shutdown(Shutdown::Both)
-        .expect("problem with shutdown");
+use std::{env, error::Error, process};
+use webget::get_url;
+fn main() -> Result<(), Box<dyn Error>> {
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 3 {
+        eprintln!("Usage: {} HOST PATH\n", args[0]);
+        eprintln!("\tExample: {} stanford.edu /class/cs144\n", args[0]);
+        process::exit(1)
+    }
+    let url = &args[1];
+    let path = &args[2];
+    get_url(url, path)?;
+    Ok(())
 }
