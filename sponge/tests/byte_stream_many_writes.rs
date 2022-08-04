@@ -1,5 +1,5 @@
-use bytestream::ByteStream;
 use rand::{distributions::Alphanumeric, prelude::*};
+use sponge::bytestream::ByteStream;
 
 const NREPS: usize = 1000;
 const MIN_WRITE: usize = 10;

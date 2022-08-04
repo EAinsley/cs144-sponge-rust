@@ -1,4 +1,4 @@
-use bytestream::ByteStream;
+use sponge::bytestream::ByteStream;
 
 #[test]
 fn write_end_pop() {
