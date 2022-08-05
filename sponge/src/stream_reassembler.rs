@@ -17,6 +17,13 @@ impl StreamReassembler {
   ) {
     todo!();
   }
+  pub fn as_stream(&self) -> &ByteStream {
+    todo!();
+  }
+  pub fn as_mut_stream(&mut self) -> &mut ByteStream {
+    todo!();
+  }
+
   pub fn unassembled_bytes(&self) -> usize {
     todo!();
   }
@@ -24,3 +31,6 @@ impl StreamReassembler {
     todo!();
   }
 }
+
+#[cfg(test)]
+mod tests;
