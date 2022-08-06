@@ -1,7 +1,7 @@
 use super::super::*;
 
 #[test]
-fn seq_1() {
+fn seq_0() {
   let mut sr = StreamReassembler::new(65000);
 
   sr.push_substring("abcd", 0, false);
@@ -18,7 +18,7 @@ fn seq_1() {
 }
 
 #[test]
-fn seq_2() {
+fn seq_1() {
   let mut sr = StreamReassembler::new(65000);
 
   for i in 0..100 {
@@ -34,7 +34,7 @@ fn seq_2() {
 }
 
 #[test]
-fn seq_3() {
+fn seq_2() {
   let mut sr = StreamReassembler::new(65000);
   for i in 0..100 {
     assert_eq!(sr.as_stream().bytes_written(), i * 4);
