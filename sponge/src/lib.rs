@@ -1,2 +1,2 @@
 pub mod bytestream;
-mod stream_reassembler;
+pub mod stream_reassembler;
