@@ -38,12 +38,11 @@ fn win_0() {
         off,
         off + sz == offset,
       );
-
-      let sr_size = sr.as_stream().buffer_size();
-      let res = sr.as_mut_stream().read(sr_size);
-
-      assert_eq!(sr_size, offset);
-      assert_eq!(res, data);
     }
+    let sr_size = sr.as_stream().buffer_size();
+    let res = sr.as_mut_stream().read(sr_size);
+
+    assert_eq!(sr_size, offset);
+    assert_eq!(res, data);
   }
 }

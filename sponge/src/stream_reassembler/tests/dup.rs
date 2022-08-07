@@ -35,13 +35,13 @@ fn dup_1() {
   assert!(!sr.as_stream().eof());
 
   sr.push_substring("abcd", 0, false);
-  assert_eq!(sr.as_stream().bytes_written(), 4);
+  assert_eq!(sr.as_stream().bytes_written(), 8);
   assert_eq!(sr.as_stream().buffer_size(), 0);
   assert_eq!(sr.as_mut_stream().read(0), "");
   assert!(!sr.as_stream().eof());
 
   sr.push_substring("abcd", 4, false);
-  assert_eq!(sr.as_stream().bytes_written(), 4);
+  assert_eq!(sr.as_stream().bytes_written(), 8);
   assert_eq!(sr.as_stream().buffer_size(), 0);
   assert_eq!(sr.as_mut_stream().read(0), "");
   assert!(!sr.as_stream().eof());
@@ -85,6 +85,6 @@ fn dup_3() {
   sr.push_substring("abcdef", 0, false);
   assert_eq!(sr.as_stream().bytes_written(), 6);
   assert_eq!(sr.as_stream().buffer_size(), 2);
-  assert_eq!(sr.as_mut_stream().read(2), "df");
+  assert_eq!(sr.as_mut_stream().read(2), "ef");
   assert!(!sr.as_stream().eof());
 }
