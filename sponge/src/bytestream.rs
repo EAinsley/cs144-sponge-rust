@@ -36,6 +36,15 @@ impl ByteStream {
     self.bytes_written += num;
     num
   }
+  /// Write one character into the stream.
+  pub fn write_char(&mut self, data: char) -> bool {
+    if self.remaining_capacity() == 0 {
+      return false;
+    }
+    self.buffer.push_back(data);
+    self.bytes_written += 1;
+    true
+  }
 
   /// Returns the number of additional bytes that the stream has space for
   pub fn remaining_capacity(&self) -> usize {
