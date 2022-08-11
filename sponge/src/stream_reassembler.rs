@@ -1,7 +1,7 @@
 //! A class that assembles a series of excerpts from a byte stream
 //! (possibly out of order, possibly overlapping) into an in-order byte stream.
 
-use super::bytestream::ByteStream;
+use super::ByteStream;
 use std::vec;
 
 pub struct StreamReassembler {
