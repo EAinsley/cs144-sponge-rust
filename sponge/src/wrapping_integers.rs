@@ -9,11 +9,11 @@ pub struct WrappingInt32 {
 }
 
 impl WrappingInt32 {
-  fn new(raw_value: u32) -> WrappingInt32 {
+  pub fn new(raw_value: u32) -> WrappingInt32 {
     WrappingInt32 { raw_value }
   }
 
-  fn raw_value(&self) -> u32 {
+  pub fn raw_value(&self) -> u32 {
     self.raw_value
   }
 
@@ -21,7 +21,7 @@ impl WrappingInt32 {
   /// n: the absolute sequence number
   /// isn: the initial sequence number
   /// returns the relative sequence number
-  fn wrap(n: u64, isn: WrappingInt32) -> WrappingInt32 {
+  pub fn wrap(n: u64, isn: WrappingInt32) -> WrappingInt32 {
     isn + (n as u32)
   }
 
@@ -41,7 +41,7 @@ impl WrappingInt32 {
   /// stream runs from the local TCPSender to the remote TCPReceiver and has one
   /// ISN, and the other stream runs from the remote TCPSender to the local
   /// TCPReceiver and has a different ISN.
-  fn unwrap(
+  pub fn unwrap(
     n: WrappingInt32,
     isn: WrappingInt32,
     checkpoint: u64,
