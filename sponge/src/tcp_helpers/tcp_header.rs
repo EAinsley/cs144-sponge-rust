@@ -1,7 +1,7 @@
 use super::super::utils::parser::{NetParser, ParserResult};
 use super::super::WrappingInt32;
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub struct TCPHeader {
   /// # TCPHeader
   ///   0                   1                   2                   3
@@ -23,20 +23,20 @@ pub struct TCPHeader {
   ///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   ///  |                             data                              |
   ///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  sport: u16,
-  dport: u16,
-  seqno: WrappingInt32,
-  ackno: WrappingInt32,
-  doff: u8,
-  urg: bool,
-  ack: bool,
-  psh: bool,
-  rst: bool,
-  syn: bool,
-  fin: bool,
-  win: u16,
-  cksum: u16,
-  uptr: u16,
+  pub sport: u16,
+  pub dport: u16,
+  pub seqno: WrappingInt32,
+  pub ackno: WrappingInt32,
+  pub doff: u8,
+  pub urg: bool,
+  pub ack: bool,
+  pub psh: bool,
+  pub rst: bool,
+  pub syn: bool,
+  pub fin: bool,
+  pub win: u16,
+  pub cksum: u16,
+  pub uptr: u16,
 }
 
 impl TCPHeader {

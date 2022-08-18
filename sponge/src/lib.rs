@@ -1,10 +1,11 @@
 mod bytestream;
 mod stream_reassembler;
-pub mod tcp_receiver;
+mod tcp_receiver;
 mod wrapping_integers;
 
 pub use bytestream::ByteStream;
 pub use stream_reassembler::StreamReassembler;
+pub use tcp_receiver::TCPReceiver;
 
 use wrapping_integers::WrappingInt32;
 

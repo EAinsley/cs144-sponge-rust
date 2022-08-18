@@ -2,7 +2,7 @@ use crate::tcp_helpers::TCPSegment;
 use crate::ByteStream;
 
 use super::{StreamReassembler, WrappingInt32};
-struct TCPReceiver {
+pub struct TCPReceiver {
   reassembler: StreamReassembler,
   capacity: usize,
   seqno: u64,
@@ -30,7 +30,11 @@ impl TCPReceiver {
   // sequence number of the first byte in the stream that the receiver hasn't
   // received.
   pub fn ackno(&self) -> Option<WrappingInt32> {
-    todo!()
+    if let Some(isn) = self.isn {
+      Some(WrappingInt32::wrap(self.seqno, isn))
+    } else {
+      None
+    }
   }
   /// The window size that should be sent to the peer
   ///
@@ -43,7 +47,9 @@ impl TCPReceiver {
   /// accepted by the receiver) and (b) the sequence number of the
   /// beginning of the window (the ackno).
   pub fn window_size(&self) -> usize {
-    todo!()
+    self.capacity
+      - (self.reassembler.as_stream().bytes_written()
+        - self.reassembler.as_stream().bytes_read())
   }
 
   /// number of bytes stored but not yet reassembled
@@ -52,8 +58,43 @@ impl TCPReceiver {
   }
 
   /// handle an inbound segment
-  pub fn segment_received(seg: &TCPSegment) {
-    todo!();
+  pub fn segment_received(&mut self, seg: &TCPSegment) {
+    // check syn
+    if seg.header().syn {
+      self.isn = Some(seg.header().seqno);
+    }
+    if self.isn == None {
+      return;
+    }
+
+    // check fin
+    let seqno_unwrap = WrappingInt32::unwrap(
+      seg.header().seqno,
+      self.isn.unwrap(),
+      self.seqno,
+    );
+    if seg.header().fin {
+      self.fin_seq =
+        Some(seqno_unwrap + seg.length_in_sequence_space() as u64);
+    }
+
+    // compute index(absolute seqno)
+    let index = if seg.header().syn {
+      seqno_unwrap
+    } else {
+      seqno_unwrap - 1
+    };
+    self.reassembler.push_substring(
+      seg.payload().copy().as_str(),
+      index as usize,
+      seg.header().fin,
+    );
+    // update the seqno
+    self.seqno =
+      (self.reassembler.as_stream().bytes_written() + 1) as u64;
+    if self.fin_seq == Some(self.seqno + 1) {
+      self.seqno += 1;
+    }
   }
 
   pub fn as_stream(&self) -> &ByteStream {

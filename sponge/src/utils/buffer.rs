@@ -10,4 +10,7 @@ impl Buffer {
   pub fn remove_prefix(&self, n: usize) {
     todo!();
   }
+  pub fn copy(&self) -> String {
+    todo!();
+  }
 }
