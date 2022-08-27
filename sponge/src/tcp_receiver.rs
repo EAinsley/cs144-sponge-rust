@@ -104,3 +104,6 @@ impl TCPReceiver {
     self.reassembler.as_mut_stream()
   }
 }
+
+#[cfg(test)]
+mod tests;
