@@ -1,13 +1,13 @@
 use crate::TCPReceiver;
 
-struct TCPReceiverSummary;
+pub struct TCPReceiverSummary;
 #[allow(dead_code)]
 impl TCPReceiverSummary {
-  const ERROR: &'static str = "error (connection was reset)";
-  const LISTEN: &'static str = "waiting for SYN: ackno is empty";
-  const SYN_RECV: &'static str =
+  pub const ERROR: &'static str = "error (connection was reset)";
+  pub const LISTEN: &'static str = "waiting for SYN: ackno is empty";
+  pub const SYN_RECV: &'static str =
     "SYN received (ackno exists), and input to stream hasn't ended";
-  const FIN_RECV: &'static str = "input to stream has ended";
+  pub const FIN_RECV: &'static str = "input to stream has ended";
 }
 
 #[allow(dead_code)]

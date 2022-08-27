@@ -26,7 +26,12 @@ impl Display for ReceiverExpectationViolation {
 impl Error for ReceiverExpectationViolation {}
 
 pub struct ExpectState {
-  pub state: &'static str,
+  state: &'static str,
+}
+impl ExpectState {
+  pub fn new(state: &'static str) -> ExpectState {
+    ExpectState { state }
+  }
 }
 impl ReceiverTestStep for ExpectState {
   const MSG: &'static str = "Expectation";
@@ -53,7 +58,13 @@ impl ReceiverTestStep for ExpectState {
 }
 
 pub struct ExpectAckno {
-  pub ackno: Option<WrappingInt32>,
+  ackno: Option<WrappingInt32>,
+}
+
+impl ExpectAckno {
+  pub fn new(ackno: Option<WrappingInt32>) -> ExpectAckno {
+    ExpectAckno { ackno }
+  }
 }
 
 impl ReceiverTestStep for ExpectAckno {
@@ -94,7 +105,12 @@ impl ReceiverTestStep for ExpectAckno {
 }
 
 pub struct ExpectWindow {
-  pub window: usize,
+  window: usize,
+}
+impl ExpectWindow {
+  pub fn new(window: usize) -> ExpectWindow {
+    ExpectWindow { window }
+  }
 }
 impl ReceiverTestStep for ExpectWindow {
   const MSG: &'static str = "Expectation";
@@ -121,7 +137,13 @@ impl ReceiverTestStep for ExpectWindow {
 }
 
 pub struct ExpectUnassembledBytes {
-  pub n_bytes: usize,
+  n_bytes: usize,
+}
+
+impl ExpectUnassembledBytes {
+  pub fn new(n_bytes: usize) -> ExpectUnassembledBytes {
+    ExpectUnassembledBytes { n_bytes }
+  }
 }
 
 impl ReceiverTestStep for ExpectUnassembledBytes {
@@ -148,11 +170,17 @@ impl ReceiverTestStep for ExpectUnassembledBytes {
   }
 }
 
-pub struct ExpectAssembledBytes {
-  pub n_bytes: usize,
+pub struct ExpectTotalAssembledBytes {
+  n_bytes: usize,
 }
 
-impl ReceiverTestStep for ExpectAssembledBytes {
+impl ExpectTotalAssembledBytes {
+  pub fn new(n_bytes: usize) -> ExpectTotalAssembledBytes {
+    ExpectTotalAssembledBytes { n_bytes }
+  }
+}
+
+impl ReceiverTestStep for ExpectTotalAssembledBytes {
   const MSG: &'static str = "Expectation";
   fn description(&self) -> String {
     self.n_bytes.to_string() + " assembled bytes, in total"
@@ -261,7 +289,7 @@ impl ReceiverTestStep for ExpectBytes {
         ),
       });
     }
-    todo!()
+    Ok(())
   }
 }
 #[derive(PartialEq, Clone, Copy)]
@@ -291,52 +319,60 @@ impl SegmentArrives {
   }
 
   pub fn with_ack_wrapping(
-    &mut self,
-    ackno_: WrappingInt32,
-  ) -> &SegmentArrives {
-    self.ack = true;
-    self.ackno = ackno_;
-    self
+    self,
+    ackno: WrappingInt32,
+  ) -> SegmentArrives {
+    SegmentArrives {
+      ack: true,
+      ackno,
+      ..self
+    }
   }
-  pub fn with_ack_u32(&mut self, ackno_: u32) -> &SegmentArrives {
-    self.with_ack_wrapping(WrappingInt32::new(ackno_))
+  pub fn new() -> SegmentArrives {
+    SegmentArrives {
+      ack: false,
+      rst: false,
+      syn: false,
+      fin: false,
+      seqno: WrappingInt32::new(0),
+      ackno: WrappingInt32::new(0),
+      win: 0,
+      data: String::new(),
+      result: None,
+    }
   }
-  pub fn with_rst(&mut self) -> &SegmentArrives {
-    self.rst = true;
-    self
+  pub fn with_ack_u32(self, ackno: u32) -> SegmentArrives {
+    self.with_ack_wrapping(WrappingInt32::new(ackno))
   }
-  pub fn with_syn(&mut self) -> &SegmentArrives {
-    self.syn = true;
-    self
+  pub fn with_rst(self) -> SegmentArrives {
+    SegmentArrives { rst: true, ..self }
   }
-  pub fn with_fin(&mut self) -> &SegmentArrives {
-    self.fin = true;
-    self
+  pub fn with_syn(self) -> SegmentArrives {
+    SegmentArrives { syn: true, ..self }
+  }
+  pub fn with_fin(self) -> SegmentArrives {
+    SegmentArrives { fin: true, ..self }
   }
   pub fn with_sequo_Wrapping(
-    &mut self,
-    seqno_: WrappingInt32,
-  ) -> &SegmentArrives {
-    self.seqno = seqno_;
-    self
+    self,
+    seqno: WrappingInt32,
+  ) -> SegmentArrives {
+    SegmentArrives { seqno, ..self }
   }
-  pub fn with_seqno_u32(&mut self, seqno_: u32) -> &SegmentArrives {
-    self.with_sequo_Wrapping(WrappingInt32::new(seqno_))
+  pub fn with_seqno_u32(self, seqno: u32) -> SegmentArrives {
+    self.with_sequo_Wrapping(WrappingInt32::new(seqno))
   }
-  pub fn with_win(&mut self, win_: u16) -> &SegmentArrives {
-    self.win = win_;
-    self
+  pub fn with_win(self, win: u16) -> SegmentArrives {
+    SegmentArrives { win, ..self }
   }
-  pub fn with_data(&mut self, data_: String) -> &SegmentArrives {
-    self.data = data_;
-    self
+  pub fn with_data(self, data: String) -> SegmentArrives {
+    SegmentArrives { data, ..self }
   }
-  pub fn with_result(
-    &mut self,
-    result_: SegmentResult,
-  ) -> &SegmentArrives {
-    self.result = Some(result_);
-    self
+  pub fn with_result(self, result: SegmentResult) -> SegmentArrives {
+    SegmentArrives {
+      result: Some(result),
+      ..self
+    }
   }
   pub fn build_segment(&self) -> TCPSegment {
     let mut seg = TCPSegment::new();
@@ -411,7 +447,7 @@ impl TCPReceiverTestHarness {
       )],
     }
   }
-  pub fn execute<T>(&mut self, step: &T)
+  pub fn execute<T>(&mut self, step: T)
   where
     T: ReceiverTestStep,
   {

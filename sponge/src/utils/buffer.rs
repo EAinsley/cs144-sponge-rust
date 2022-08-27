@@ -27,6 +27,10 @@ impl Buffer {
     todo!();
   }
   pub fn copy(&self) -> String {
-    todo!();
+    (*self.storage).clone()
+  }
+  pub fn str(&self) -> &String {
+    // &self.storage.str
+    todo!()
   }
 }
