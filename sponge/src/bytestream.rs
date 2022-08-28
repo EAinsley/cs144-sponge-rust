@@ -7,7 +7,7 @@
 use std::collections::VecDeque;
 /// The ByteStream struct
 pub struct ByteStream {
-  buffer: VecDeque<char>,
+  buffer: VecDeque<u8>,
   capacity: usize,
   bytes_written: usize,
   bytes_read: usize,
@@ -28,16 +28,8 @@ impl ByteStream {
     }
   }
 
-  /// Write a string of bytes into the stream. Write as many
-  /// as will fit, and return how many were written.
-  pub fn write(&mut self, data: &str) -> usize {
-    let num = data.len().min(self.remaining_capacity());
-    self.buffer.extend(data[0..num].chars());
-    self.bytes_written += num;
-    num
-  }
   /// Write one character into the stream.
-  pub fn write_char(&mut self, data: char) -> bool {
+  pub fn write_char(&mut self, data: u8) -> bool {
     if self.remaining_capacity() == 0 {
       return false;
     }
@@ -61,23 +53,11 @@ impl ByteStream {
     self.is_error = true;
   }
 
-  /// Peek at next "len" bytes of the stream
-  pub fn peek_output(&self, len: usize) -> String {
-    let num = len.min(self.buffer_size());
-    self.buffer.range(..num).collect()
-  }
   /// Remove bytes from the buffer
   pub fn pop_output(&mut self, len: usize) {
     let num = len.min(self.buffer_size());
     self.buffer.drain(..num);
     self.bytes_read += num;
-  }
-
-  /// Read (i.e., copy and then pop) the next "len" bytes of the stream
-  pub fn read(&mut self, len: usize) -> String {
-    let readout = self.peek_output(len);
-    self.pop_output(len);
-    readout
   }
 
   /// Returns `true` if the stream input has ended
@@ -113,6 +93,32 @@ impl ByteStream {
   /// Total number of bytes popped
   pub fn bytes_read(&self) -> usize {
     self.bytes_read
+  }
+}
+
+impl std::io::Read for ByteStream {
+  /// Read the bytes of the stream to buffer
+  /// and return the number of bytes read.
+  fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+    let num = buf.len().min(self.buffer_size());
+    let readout = self.buffer.read(buf)?;
+    self.bytes_read += readout;
+    Ok(readout)
+  }
+}
+
+impl std::io::Write for ByteStream {
+  /// Write a string of bytes into the stream. Write as many
+  /// as will fit, and return how many were written.
+  fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+    let num = buf.len().min(self.remaining_capacity());
+    self.buffer.extend(buf[0..num].iter());
+    self.bytes_written += num;
+    Ok(num)
+  }
+
+  fn flush(&mut self) -> std::io::Result<()> {
+    self.buffer.flush()
   }
 }
 
