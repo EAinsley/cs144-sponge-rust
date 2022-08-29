@@ -57,7 +57,7 @@ impl NetParser {
   pub fn get_error(&self) -> ParserResult {
     self.error
   }
-  pub fn set_error(&mut self, res: ParserResult) {
+  pub fn set_error(&mut self, _res: ParserResult) {
     todo!()
   }
   pub fn error(&self) -> bool {

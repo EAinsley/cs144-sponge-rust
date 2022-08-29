@@ -18,10 +18,10 @@ impl TCPSegment {
     &mut self.header
   }
   pub fn length_in_sequence_space(&self) -> usize {
-    todo!();
+    self.payload()
   }
   pub fn payload(&self) -> &Buffer {
-    &self.payload
+    &self.payload()
   }
   pub fn payload_mut(&mut self) -> &mut Buffer {
     &mut self.payload

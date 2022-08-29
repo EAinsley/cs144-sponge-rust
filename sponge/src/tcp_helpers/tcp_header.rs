@@ -60,7 +60,7 @@ impl TCPHeader {
     }
   }
 
-  pub fn parse(p: &NetParser) -> ParserResult {
+  pub fn parse(_p: &NetParser) -> ParserResult {
     todo!()
   }
 
@@ -72,7 +72,14 @@ impl TCPHeader {
     todo!()
   }
 
-  pub fn summary() -> String {
-    todo!()
+  pub fn summary(&self) -> String {
+    let keep = [self.syn, self.ack, self.rst, self.fin];
+    let mut iter = keep.iter();
+    let mut flag = String::from("SARF");
+    flag.retain(|_| *iter.next().unwrap());
+    format!(
+      "Header(flag={},seqno={},ack={},win={}",
+      flag, self.seqno, self.ackno, self.win
+    )
   }
 }
