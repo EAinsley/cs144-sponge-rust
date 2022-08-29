@@ -1,25 +1,25 @@
-use super::super::*;
+use super::byte_stream_harness::*;
+
 #[test]
 fn byte_stream_construction() {
-  let stream = ByteStream::new(15);
-
-  assert_eq!(stream.input_ended(), false);
-  assert_eq!(stream.buffer_empty(), true);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 0);
-  assert_eq!(stream.bytes_written(), 0);
-  assert_eq!(stream.remaining_capacity(), 15);
-  assert_eq!(stream.buffer_size(), 0);
+  let mut test = ByteStreamTestHarness::with_capacity(15);
+  test.execute(ExpectInputEnded::new(false));
+  test.execute(ExpectBufferEmpty::new(true));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(0));
+  test.execute(ExpectBytesWritten::new(0));
+  test.execute(ExpectRemainingCapacity::new(15));
+  test.execute(ExpectBufferSize::new(0));
 }
 #[test]
 fn byte_stream_construction_end() {
-  let mut stream = ByteStream::new(15);
-  stream.end_input();
-  assert_eq!(stream.input_ended(), true);
-  assert_eq!(stream.buffer_empty(), true);
-  assert_eq!(stream.eof(), true);
-  assert_eq!(stream.bytes_read(), 0);
-  assert_eq!(stream.bytes_written(), 0);
-  assert_eq!(stream.remaining_capacity(), 15);
-  assert_eq!(stream.buffer_size(), 0);
+  let mut test = ByteStreamTestHarness::with_capacity(15);
+  test.execute(ActionEndInput);
+  test.execute(ExpectInputEnded::new(true));
+  test.execute(ExpectBufferEmpty::new(true));
+  test.execute(ExpectEof::new(true));
+  test.execute(ExpectBytesRead::new(0));
+  test.execute(ExpectBytesWritten::new(0));
+  test.execute(ExpectRemainingCapacity::new(15));
+  test.execute(ExpectBufferSize::new(0));
 }

@@ -1,117 +1,117 @@
-use super::super::*;
+use super::byte_stream_harness::*;
 #[test]
 fn write_write_end_pop_pop() {
-  let mut stream = ByteStream::new(15);
+  let mut test = ByteStreamTestHarness::with_capacity(15);
 
-  assert_eq!(stream.write("cat"), 3);
+  test.execute(ActionWrite::new(b"cat"));
 
-  assert_eq!(stream.input_ended(), false);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 0);
-  assert_eq!(stream.bytes_written(), 3);
-  assert_eq!(stream.remaining_capacity(), 12);
-  assert_eq!(stream.buffer_size(), 3);
-  assert_eq!(stream.peek_output(3), "cat");
+  test.execute(ExpectInputEnded::new(false));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(0));
+  test.execute(ExpectBytesWritten::new(3));
+  test.execute(ExpectRemainingCapacity::new(12));
+  test.execute(ExpectBufferSize::new(3));
+  test.execute(ExpectPeek::new(b"cat"));
 
-  assert_eq!(stream.write("tac"), 3);
+  test.execute(ActionWrite::new(b"tac"));
 
-  assert_eq!(stream.input_ended(), false);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 0);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 9);
-  assert_eq!(stream.buffer_size(), 6);
-  assert_eq!(stream.peek_output(6), "cattac");
+  test.execute(ExpectInputEnded::new(false));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(0));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(9));
+  test.execute(ExpectBufferSize::new(6));
+  test.execute(ExpectPeek::new(b"cattac"));
 
-  stream.end_input();
+  test.execute(ActionEndInput);
 
-  assert_eq!(stream.input_ended(), true);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 0);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 9);
-  assert_eq!(stream.buffer_size(), 6);
-  assert_eq!(stream.peek_output(6), "cattac");
+  test.execute(ExpectInputEnded::new(true));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(0));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(9));
+  test.execute(ExpectBufferSize::new(6));
+  test.execute(ExpectPeek::new(b"cattac"));
 
-  stream.pop_output(2);
+  test.execute(ActionPop::new(2));
 
-  assert_eq!(stream.input_ended(), true);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 2);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 11);
-  assert_eq!(stream.buffer_size(), 4);
-  assert_eq!(stream.peek_output(4), "ttac");
+  test.execute(ExpectInputEnded::new(true));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(2));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(11));
+  test.execute(ExpectBufferSize::new(4));
+  test.execute(ExpectPeek::new(b"ttac"));
 
-  stream.pop_output(4);
+  test.execute(ActionPop::new(4));
 
-  assert_eq!(stream.input_ended(), true);
-  assert_eq!(stream.buffer_empty(), true);
-  assert_eq!(stream.eof(), true);
-  assert_eq!(stream.bytes_read(), 6);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 15);
-  assert_eq!(stream.buffer_size(), 0);
+  test.execute(ExpectInputEnded::new(true));
+  test.execute(ExpectBufferEmpty::new(true));
+  test.execute(ExpectEof::new(true));
+  test.execute(ExpectBytesRead::new(6));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(15));
+  test.execute(ExpectBufferSize::new(0));
 }
 #[test]
 fn write_pop_write_end_pop() {
-  let mut stream = ByteStream::new(15);
+  let mut test = ByteStreamTestHarness::with_capacity(15);
 
-  assert_eq!(stream.write("cat"), 3);
+  test.execute(ActionWrite::new(b"cat"));
 
-  assert_eq!(stream.input_ended(), false);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 0);
-  assert_eq!(stream.bytes_written(), 3);
-  assert_eq!(stream.remaining_capacity(), 12);
-  assert_eq!(stream.buffer_size(), 3);
-  assert_eq!(stream.peek_output(3), "cat");
+  test.execute(ExpectInputEnded::new(false));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(0));
+  test.execute(ExpectBytesWritten::new(3));
+  test.execute(ExpectRemainingCapacity::new(12));
+  test.execute(ExpectBufferSize::new(3));
+  test.execute(ExpectPeek::new(b"cat"));
 
-  stream.pop_output(2);
+  test.execute(ActionPop::new(2));
 
-  assert_eq!(stream.input_ended(), false);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 2);
-  assert_eq!(stream.bytes_written(), 3);
-  assert_eq!(stream.remaining_capacity(), 14);
-  assert_eq!(stream.buffer_size(), 1);
-  assert_eq!(stream.peek_output(1), "t");
+  test.execute(ExpectInputEnded::new(false));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(2));
+  test.execute(ExpectBytesWritten::new(3));
+  test.execute(ExpectRemainingCapacity::new(14));
+  test.execute(ExpectBufferSize::new(1));
+  test.execute(ExpectPeek::new(b"t"));
 
-  assert_eq!(stream.write("tac"), 3);
+  test.execute(ActionWrite::new(b"tac"));
 
-  assert_eq!(stream.input_ended(), false);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 2);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 11);
-  assert_eq!(stream.buffer_size(), 4);
-  assert_eq!(stream.peek_output(4), "ttac");
+  test.execute(ExpectInputEnded::new(false));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(2));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(11));
+  test.execute(ExpectBufferSize::new(4));
+  test.execute(ExpectPeek::new(b"ttac"));
 
-  stream.end_input();
+  test.execute(ActionEndInput);
 
-  assert_eq!(stream.input_ended(), true);
-  assert_eq!(stream.buffer_empty(), false);
-  assert_eq!(stream.eof(), false);
-  assert_eq!(stream.bytes_read(), 2);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 11);
-  assert_eq!(stream.buffer_size(), 4);
-  assert_eq!(stream.peek_output(4), "ttac");
+  test.execute(ExpectInputEnded::new(true));
+  test.execute(ExpectBufferEmpty::new(false));
+  test.execute(ExpectEof::new(false));
+  test.execute(ExpectBytesRead::new(2));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(11));
+  test.execute(ExpectBufferSize::new(4));
+  test.execute(ExpectPeek::new(b"ttac"));
 
-  stream.pop_output(4);
+  test.execute(ActionPop::new(4));
 
-  assert_eq!(stream.input_ended(), true);
-  assert_eq!(stream.buffer_empty(), true);
-  assert_eq!(stream.eof(), true);
-  assert_eq!(stream.bytes_read(), 6);
-  assert_eq!(stream.bytes_written(), 6);
-  assert_eq!(stream.remaining_capacity(), 15);
-  assert_eq!(stream.buffer_size(), 0);
+  test.execute(ExpectInputEnded::new(true));
+  test.execute(ExpectBufferEmpty::new(true));
+  test.execute(ExpectEof::new(true));
+  test.execute(ExpectBytesRead::new(6));
+  test.execute(ExpectBytesWritten::new(6));
+  test.execute(ExpectRemainingCapacity::new(15));
+  test.execute(ExpectBufferSize::new(0));
 }
