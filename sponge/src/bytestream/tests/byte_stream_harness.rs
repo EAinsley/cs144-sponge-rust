@@ -1,9 +1,6 @@
 use super::super::*;
-use std::io::{self, Write};
-use std::{
-  error::Error,
-  fmt::{format, Display},
-};
+use std::io::Write;
+use std::{error::Error, fmt::Display};
 pub trait BytestreamTestStep {
   const MSG: &'static str;
   fn execute(
@@ -21,7 +18,10 @@ pub struct BytestreamExpectationViolation {
 }
 
 impl BytestreamExpectationViolation {
-  pub fn new<T>(
+  pub fn new(msg: String) -> BytestreamExpectationViolation {
+    BytestreamExpectationViolation { msg }
+  }
+  pub fn with_property<T>(
     property_name: String,
     expected: &T,
     actual: &T,
@@ -48,11 +48,7 @@ impl Display for BytestreamExpectationViolation {
 impl Error for BytestreamExpectationViolation {}
 
 pub struct ActionEndInput;
-impl ActionEndInput {
-  pub fn new() -> ActionEndInput {
-    ActionEndInput
-  }
-}
+
 impl BytestreamTestStep for ActionEndInput {
   const MSG: &'static str = "Action";
 
@@ -102,11 +98,13 @@ impl<'a> BytestreamTestStep for ActionWrite<'a> {
     let actual_bw = bytestream.write(self.data)?;
     if let Some(expected_bw) = self.bytes_written {
       if expected_bw != actual_bw {
-        return Err(Box::new(BytestreamExpectationViolation::new(
-          String::from("bytes_written"),
-          &expected_bw,
-          &actual_bw,
-        )));
+        return Err(Box::new(
+          BytestreamExpectationViolation::with_property(
+            String::from("bytes_written"),
+            &expected_bw,
+            &actual_bw,
+          ),
+        ));
       }
     }
     Ok(())
@@ -163,7 +161,7 @@ impl BytestreamTestStep for ExpectInputEnded {
   ) -> Result<(), Box<dyn Error>> {
     let actual_ie = bytestream.input_ended();
     if actual_ie != self.input_ended {
-      Err(Box::new(BytestreamExpectationViolation::new(
+      Err(Box::new(BytestreamExpectationViolation::with_property(
         String::from("input_ended"),
         &self.input_ended,
         &actual_ie,
@@ -197,7 +195,7 @@ impl BytestreamTestStep for ExpectBufferEmpty {
   ) -> Result<(), Box<dyn Error>> {
     let actual_be = bytestream.buffer_empty();
     if actual_be != self.buffer_empty {
-      Err(Box::new(BytestreamExpectationViolation::new(
+      Err(Box::new(BytestreamExpectationViolation::with_property(
         String::from("buffer_empty"),
         &self.buffer_empty,
         &actual_be,
@@ -231,7 +229,7 @@ impl BytestreamTestStep for ExpectEof {
   ) -> Result<(), Box<dyn Error>> {
     let actual_eof = bytestream.eof();
     if actual_eof != self.eof {
-      Err(Box::new(BytestreamExpectationViolation::new(
+      Err(Box::new(BytestreamExpectationViolation::with_property(
         String::from("eof"),
         &self.eof,
         &actual_eof,
@@ -265,7 +263,7 @@ impl BytestreamTestStep for ExpectBufferSize {
   ) -> Result<(), Box<dyn Error>> {
     let actual_bs = bytestream.buffer_size();
     if actual_bs != self.buffer_size {
-      Err(Box::new(BytestreamExpectationViolation::new(
+      Err(Box::new(BytestreamExpectationViolation::with_property(
         String::from("buffer_size"),
         &self.buffer_size,
         &actual_bs,
@@ -280,67 +278,85 @@ impl BytestreamTestStep for ExpectBufferSize {
   }
 }
 
-pub struct BytesWritten {
+pub struct ExpectBytesWritten {
   pub bytes_written: usize,
 }
 
-impl BytesWritten {
-  pub fn new(bytes_written: usize) -> BytesWritten {
-    BytesWritten { bytes_written }
+impl ExpectBytesWritten {
+  pub fn new(bytes_written: usize) -> ExpectBytesWritten {
+    ExpectBytesWritten { bytes_written }
   }
 }
 
-impl BytestreamTestStep for BytesWritten {
+impl BytestreamTestStep for ExpectBytesWritten {
   const MSG: &'static str = "Expectation";
 
   fn execute(
     &self,
     bytestream: &mut ByteStream,
   ) -> Result<(), Box<dyn Error>> {
-    todo!()
+    let actual_bw = bytestream.bytes_written();
+    if actual_bw != self.bytes_written {
+      Err(Box::new(BytestreamExpectationViolation::with_property(
+        String::from("bytes_written"),
+        &self.bytes_written,
+        &actual_bw,
+      )))
+    } else {
+      Ok(())
+    }
   }
 
   fn description(&self) -> String {
-    todo!()
+    format!("bytes_written: {}", self.bytes_written)
   }
 }
 
-pub struct BytesRead {
+pub struct ExpectBytesRead {
   pub bytes_read: usize,
 }
 
-impl BytesRead {
-  pub fn new(bytes_read: usize) -> BytesRead {
-    BytesRead { bytes_read }
+impl ExpectBytesRead {
+  pub fn new(bytes_read: usize) -> ExpectBytesRead {
+    ExpectBytesRead { bytes_read }
   }
 }
 
-impl BytestreamTestStep for BytesRead {
+impl BytestreamTestStep for ExpectBytesRead {
   const MSG: &'static str = "Expectation";
 
   fn execute(
     &self,
     bytestream: &mut ByteStream,
   ) -> Result<(), Box<dyn Error>> {
-    todo!()
+    let actual_br = bytestream.bytes_read();
+    if actual_br != self.bytes_read {
+      Err(Box::new(BytestreamExpectationViolation::with_property(
+        String::from("bytes_read"),
+        &self.bytes_read,
+        &actual_br,
+      )))
+    } else {
+      Ok(())
+    }
   }
 
   fn description(&self) -> String {
-    todo!()
+    format!("bytes_read: {}", self.bytes_read)
   }
 }
 
-pub struct RemainingCapacity {
+pub struct ExpectRemainingCapacity {
   pub remaining_capacity: usize,
 }
 
-impl RemainingCapacity {
-  pub fn new(remaining_capacity: usize) -> RemainingCapacity {
-    RemainingCapacity { remaining_capacity }
+impl ExpectRemainingCapacity {
+  pub fn new(remaining_capacity: usize) -> ExpectRemainingCapacity {
+    ExpectRemainingCapacity { remaining_capacity }
   }
 }
 
-impl BytestreamTestStep for RemainingCapacity {
+impl BytestreamTestStep for ExpectRemainingCapacity {
   const MSG: &'static str = "Expectation";
 
   fn execute(
@@ -348,8 +364,8 @@ impl BytestreamTestStep for RemainingCapacity {
     bytestream: &mut ByteStream,
   ) -> Result<(), Box<dyn Error>> {
     let actual_rc = bytestream.remaining_capacity();
-    if (actual_rc != self.remaining_capacity) {
-      Err(Box::new(BytestreamExpectationViolation::new(
+    if actual_rc != self.remaining_capacity {
+      Err(Box::new(BytestreamExpectationViolation::with_property(
         String::from("remaining_capactiy"),
         &self.remaining_capacity,
         &actual_rc,
@@ -360,32 +376,45 @@ impl BytestreamTestStep for RemainingCapacity {
   }
 
   fn description(&self) -> String {
-    todo!()
+    format!("remaining_capacity: {}", self.remaining_capacity)
   }
 }
 
-pub struct Peek {
-  pub output: Vec<u8>,
+pub struct ExpectPeek<'a> {
+  pub output: &'a [u8],
 }
 
-impl Peek {
-  pub fn new(output: Vec<u8>) -> Peek {
-    Peek { output }
+impl<'a> ExpectPeek<'a> {
+  pub fn new(output: &'a [u8]) -> ExpectPeek {
+    ExpectPeek { output }
   }
 }
 
-impl BytestreamTestStep for Peek {
+impl<'a> BytestreamTestStep for ExpectPeek<'a> {
   const MSG: &'static str = "Expectation";
 
   fn execute(
     &self,
     bytestream: &mut ByteStream,
   ) -> Result<(), Box<dyn Error>> {
-    todo!()
+    let actual_o = bytestream.peek_output(self.output.len());
+    if actual_o.as_slice() != self.output {
+      Err(Box::new(BytestreamExpectationViolation::new(format!(
+        "Expected \"{}\" at the front of  the stream, \
+      buf found \"{}\"",
+        String::from_utf8(self.output.to_vec()).unwrap(),
+        String::from_utf8(actual_o).unwrap(),
+      ))))
+    } else {
+      Ok(())
+    }
   }
 
   fn description(&self) -> String {
-    todo!()
+    format!(
+      "\"{}\" at the front of the stream",
+      String::from_utf8(self.output.to_vec()).unwrap()
+    )
   }
 }
 

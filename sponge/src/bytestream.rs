@@ -53,6 +53,12 @@ impl ByteStream {
     self.is_error = true;
   }
 
+  /// Peek at next "len" bytes of the stream
+  pub fn peek_output(&self, len: usize) -> Vec<u8> {
+    let peek_length = len.min(self.buffer_size());
+    Vec::from_iter(self.buffer.iter().take(peek_length).copied())
+  }
+
   /// Remove bytes from the buffer
   pub fn pop_output(&mut self, len: usize) {
     let num = len.min(self.buffer_size());
@@ -100,7 +106,6 @@ impl std::io::Read for ByteStream {
   /// Read the bytes of the stream to buffer
   /// and return the number of bytes read.
   fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-    let num = buf.len().min(self.buffer_size());
     let readout = self.buffer.read(buf)?;
     self.bytes_read += readout;
     Ok(readout)
